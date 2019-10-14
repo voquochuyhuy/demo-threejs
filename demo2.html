@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - glTF loader</title>
+	<style>
+		body {
+			margin: 0;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%
+		}
+
+		#button-group {
+			position: absolute;
+			bottom: 0;
+		}
+	</style>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
+	<script src="three.min.js"></script>
+	<script src="OrbitControls.js"></script>
+	<script src="GLTFLoader.js"></script>
+	
+</head>
+
+<body>
+	<div id="button-group">
+		<button id="top-view">
+			<div class="svg-icon svg-icon--active"
+				style="width: 24px; height: 24px; --color:black; --active-color:#1a6aff; --active-stroke-width:1.2; --hint-color:var(--active-color);">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+					class="">
+					<path
+						d="M.5 7.273L15.385 5.02c.088-.014.179-.001.26.036l7.855 3.58M.5 7.272v8.347c0 .177.101.338.26.415L8.94 20M.5 7.273l8.449 4.09M23.5 8.637v8.253a.462.462 0 01-.377.454L8.94 20M23.5 8.636L8.949 11.364M8.94 20l.009-8.636"
+						stroke="#000" stroke-linejoin="round"></path>
+					<path d="M.97 15.91l14.55-2.728m0 0l7.51 4.09m-7.51-4.09V5" stroke="#000" stroke-opacity=".5"
+						stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.92 1.85"></path>
+				</svg>
+			</div>
+		</button>
+		<button id="step-by-step">
+			<div class="svg-icon svg-icon--active"
+				style="width: 24px; height: 24px; --color:black; --stroke-width:0.9; --active-color:#1a6aff; --active-stroke-width:1.2; --hint-color:var(--active-color);">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+					class="">
+					<path
+						d="M8.024 22.955c.108.03.215.045.318.045.624 0 1.012-.537 1.244-.932l2.111-3.212.931-2.583 1.249 2.078.56 3.674c.141.564.613.942 1.174.942.104 0 .21-.014.315-.041.674-.174 1.014-.808.85-1.564l-.635-4.18-.007-.046-2.3-3.683-.015-.021s-.113-.156-.06-.41l.337-2.198c.226.418.5.867.697.997l1.428 1.087c.24.239.61.398.928.398.214 0 .4-.068.54-.198.43-.404.413-1.078-.043-1.568l-1.653-1.266-1.453-2.9-.037-.053A2.928 2.928 0 0012.48 6.5c-.375 0-.758.074-1.138.22L8.272 8.91c-.044.026-.431.27-.531.929l-.734 3.021-.005.032c-.026.268.261.755.261.755.2.22.482.347.782.347.544-.005.939-.407 1.054-1.065l.554-2.362.857-.743-.449 2.574c-.023.09-.12.54.062 1.229l.008.024c.045.116.165.495.133.68l-.931 3.396-2.14 3.545-.012.021c-.14.301-.139.639.005.95.158.343.472.61.838.71z"
+						stroke="#000" stroke-linecap="round" stroke-linejoin="round"></path>
+					<circle cx="13.05" cy="3.75" r="2.25" stroke="#000"></circle>
+				</svg>
+			</div>
+		</button>
+		<button id="choose-room">
+			<div class="svg-icon"
+				style="width: 24px; height: 24px; --color:black; --active-color:#1a6aff; --active-stroke-width:1.2; --hint-color:var(--active-color); transform: rotate(90deg);">
+				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+					class="">
+					<path d="M19 6.5a.5.5 0 01.5.5v10a.5.5 0 01-.5.5H5a.5.5 0 01-.5-.5V7a.5.5 0 01.5-.5h14z"
+						stroke="#000"></path>
+					<path
+						d="M4.5 2.5V4a.5.5 0 00.5.5h14a.5.5 0 00.5-.5V2.5M19.5 21.5V20a.5.5 0 00-.5-.5H5a.5.5 0 00-.5.5v1.5"
+						stroke="#000" stroke-linecap="round"></path>
+				</svg>
+			</div>
+		</button>
+		<button id="slide-show">
+			<div class="svg-icon"
+				style="width: 24px; height: 24px; --color:black; --active-color:black; --hint-color:#1a6aff;"><svg
+					viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"
+					class="">
+					<path
+						d="M5.5 19.09V4.88a.5.5 0 01.756-.43l11.546 6.876a.5.5 0 01.012.852L6.268 19.512a.5.5 0 01-.768-.422z"
+						stroke="#000"></path>
+				</svg></div>
+		</button>
+	</div>
+	<script>
+		var container, controls;
+		var camera, scene, renderer;
+		var eventState = -1;
+
+		init();
+		animate();
+
+		handleTopViewButtonClick();
+		handleStepByStepButtonClick();
+		handleChooseRoomButtonClick();
+		handleSlideShowButtonClick();
+
+		function handleTopViewButtonClick(){
+			document.getElementById("top-view").addEventListener("click",()=>{
+				if(eventState === 1)
+				{
+					eventState = -1;
+				}
+				else
+					eventState = 1;
+		});		
+		}
+		function handleStepByStepButtonClick(){
+			document.getElementById("step-by-step").addEventListener("click",()=>{
+				if(eventState === 2)
+				{
+					eventState = -1;
+					return;
+				}	
+				else eventState = 2;
+			});
+		}
+		function handleChooseRoomButtonClick(){
+			document.getElementById("choose-room").addEventListener("click",()=>{
+				if(eventState === 3)
+				{
+					eventState = -1;
+					return;
+				}	
+				else eventState = 3;
+				
+			});
+		}
+		function handleSlideShowButtonClick(){
+			document.getElementById("slide-show").addEventListener("click",()=>{
+				if(eventState === 4)
+				{
+					eventState = -1;
+					return;
+				}	
+				else eventState = 4;
+			});
+		}
+		function init() {
+			container = document.createElement('div');
+			container.setAttribute("id", "container");
+			document.body.appendChild(container);
+
+			camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 2000);
+
+			camera.position.set(0,500,800);
+			
+			renderer = new THREE.WebGLRenderer({ antialias: true, precision: 'mediump' });
+			renderer.setClearColor(0xffffff);
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.gammaOutput = true;
+			renderer.gammaFactor = 2.2;
+			container.appendChild(renderer.domElement);
+
+			//scene
+			scene = new THREE.Scene();
+
+			var light = new THREE.AmbientLight(0x404040,2.0); // soft white light
+			scene.add(light);
+			
+			//controls
+			controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+			//event
+			window.addEventListener('resize', onWindowResize, false);
+
+			//loader
+			var loader = new THREE.GLTFLoader();
+			var onProgress = function (xhr) {
+				if (xhr.lengthComputable) {
+					var percentComplete = xhr.loaded / xhr.total * 100;
+					console.log(Math.round(percentComplete, 2) + '% downloaded');
+				}
+			};
+
+			loader.load('floor_plan/scene.gltf', function (gltf) {
+				gltf.scene.position.x = -500;
+				scene.add(gltf.scene);
+			}, onProgress, function (error) {
+				console.error(error);
+			});
+			
+
+		}
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.render(scene, camera);
+		}
+		//
+		function animate() {
+			requestAnimationFrame(animate);
+			console.log(eventState);
+			switch(eventState){
+				case 1 :
+					if(camera.position.z >0)
+						camera.position.z -= 3;
+				break;
+				case 2 :
+				camera.position.z -= 3;
+				break;
+				case 3 :
+				camera.position.z -= 3;
+				break;
+				case 4 :
+				camera.position.z -= 3;
+				break;		
+			}
+			renderer.render(scene, camera);
+
+		}
+	</script>
+
+</body>
+
+</html>
