@@ -6,16 +6,32 @@
 	<style>
 		body {
 			margin: 0;
+			padding: 0;
 		}
 
 		canvas {
 			width: 100%;
-			height: 100%
+			height: 100%;
+			margin: 0;
+			padding: 0;
 		}
 
 		#button-group {
 			position: absolute;
 			bottom: 0;
+		}
+		#image-group {
+			display: none;
+		}
+		#living-room{
+			width: 117px;
+			height: 62px;
+			background-image: url("image/livingRoom.PNG");
+		}
+		#garage{
+			width: 117px;
+			height: 62px;
+			background-image: url("image/garage.PNG");
 		}
 	</style>
 	<meta charset="utf-8">
@@ -24,7 +40,6 @@
 	<script src="three.min.js"></script>
 	<script src="OrbitControls.js"></script>
 	<script src="GLTFLoader.js"></script>
-	
 </head>
 
 <body>
@@ -77,28 +92,51 @@
 						stroke="#000"></path>
 				</svg></div>
 		</button>
+		<div id="image-group">
+			<button id="living-room"></button>
+			<button id="garage"></button>
+		</div>
 	</div>
-	<script>
+	
+	<script type="module">
+		import * as TWEEN from "./Tween.js";
 		var container, controls;
 		var camera, scene, renderer;
 		var eventState = -1;
-
-		init();
-		animate();
-
+		var showRoonImage = false;
 		handleTopViewButtonClick();
 		handleStepByStepButtonClick();
 		handleChooseRoomButtonClick();
 		handleSlideShowButtonClick();
 
+		init();
+		animate();
+
 		function handleTopViewButtonClick(){
-			document.getElementById("top-view").addEventListener("click",()=>{
-				if(eventState === 1)
-				{
-					eventState = -1;
-				}
-				else
-					eventState = 1;
+			document.getElementById("top-view").addEventListener("click",()=>{	
+				var from = camera.position;
+				var to = {x:0,y:500,z:0};
+				var tween = new TWEEN.default.Tween(from)
+					.to(to, 5000)
+					.easing(TWEEN.default.Easing.Linear.None)
+					.onUpdate(function () {	
+
+						
+				})
+					.onComplete(function () {
+						camera.position.set(to.x, to.y, to.z);
+            			camera.lookAt(new THREE.Vector3(0, 0, 0));
+						controls.target.copy(scene.position);
+				})
+				tween.start();
+				// if(eventState === 1)
+				// {
+				// 	eventState = -1;
+				// }
+				// else{
+				// 	eventState = 1;
+				// }
+					
 		});		
 		}
 		function handleStepByStepButtonClick(){
@@ -112,13 +150,22 @@
 			});
 		}
 		function handleChooseRoomButtonClick(){
-			document.getElementById("choose-room").addEventListener("click",()=>{
-				if(eventState === 3)
+			
+			document.getElementById("choose-room").addEventListener("click",()=>{	
+				var div = document.getElementById('image-group');	
+				if(div.style.display !== "block")
 				{
-					eventState = -1;
-					return;
-				}	
-				else eventState = 3;
+					div.style.display = "block";	
+				}		
+				else  div.style.display = "none";
+				
+				
+				// if(eventState === 3)
+				// {
+				// 	eventState = -1;
+				// 	return;
+				// }	
+				// else eventState = 3;
 				
 			});
 		}
@@ -137,10 +184,10 @@
 			container.setAttribute("id", "container");
 			document.body.appendChild(container);
 
-			camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 2000);
+			camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
 
 			camera.position.set(0,500,800);
-			
+
 			renderer = new THREE.WebGLRenderer({ antialias: true, precision: 'mediump' });
 			renderer.setClearColor(0xffffff);
 			renderer.setPixelRatio(window.devicePixelRatio);
@@ -171,7 +218,7 @@
 			};
 
 			loader.load('floor_plan/scene.gltf', function (gltf) {
-				gltf.scene.position.x = -500;
+				gltf.scene.position.x = -550;
 				scene.add(gltf.scene);
 			}, onProgress, function (error) {
 				console.error(error);
@@ -186,26 +233,38 @@
 			renderer.render(scene, camera);
 		}
 		//
-		function animate() {
+		function animate (){
+			TWEEN.default.update();
 			requestAnimationFrame(animate);
-			console.log(eventState);
 			switch(eventState){
 				case 1 :
 					if(camera.position.z >0)
-						camera.position.z -= 3;
+					{
+						camera.position.z -= 5 ;
+						camera.position.y -= 1.5;							
+					}		
+					if(camera.position.x < 270)
+						camera.position.x +=3;	
+					if(camera.position.z <= 0 && camera.position.x >= 270)	
+					{
+						controls.update();
+						eventState = -1;
+					}
+										
 				break;
 				case 2 :
 				camera.position.z -= 3;
 				break;
-				case 3 :
-				camera.position.z -= 3;
-				break;
+				// case 3 :
+				// camera.position.z -= 3;
+				// break;
 				case 4 :
 				camera.position.z -= 3;
 				break;		
-			}
+			} 
+			
 			renderer.render(scene, camera);
-
+			controls.update();
 		}
 	</script>
 
