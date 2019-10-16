@@ -114,6 +114,8 @@
 		handleStepByStepButtonClick();
 		handleChooseRoomButtonClick();
 		handleSlideShowButtonClick();
+		handleChooseGarage();
+		handleChooseLivingRoom();
 
 		init();
 		animate();
@@ -228,6 +230,42 @@
 				else eventState = 4;
 			});
 		}
+		
+		function handleChooseLivingRoom(){
+			document.getElementById("living-room").addEventListener("click",()=>{	
+				var from = camera.position;
+				
+				var to = {x:70,y:60,z:0};
+				var tween = new TWEEN.default.Tween(from)
+					.to(to, 1000)
+					// .easing(TWEEN.default.Easing.Linear.None)
+					.onUpdate(function () {	
+						
+				})
+					.onComplete(function () {
+						
+				})
+				tween.start();					
+			});		
+		}
+		function handleChooseGarage(){
+			document.getElementById("garage").addEventListener("click",()=>{	
+				var from = camera.position;
+				var to = {x:0,y:60,z:-300};
+				var tween = new TWEEN.default.Tween(from)
+					.to(to, 1000)
+					.easing(TWEEN.default.Easing.Linear.None)
+					.onUpdate(function () {	
+
+						
+				})
+					.onComplete(function () {
+						
+				})
+				tween.start();				
+			});	
+		}
+
 		function init() {
 			console.log("init");
 
