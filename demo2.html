@@ -131,23 +131,13 @@
 					.to(to, 2000)
 					.easing(TWEEN.default.Easing.Linear.None)
 					.onUpdate(function () {
-
-
+						camera.lookAt(0,0,0);
 					})
 					.onComplete(function () {
-						camera.position.set(to.x, to.y, to.z);
-						camera.lookAt(new THREE.Vector3(0, 0, 0));
-						controls.target.copy(scene.position);
+						
 					})
 				tween.start();
-				// if(eventState === 1)
-				// {
-				// 	eventState = -1;
-				// }
-				// else{
-				// 	eventState = 1;
-				// }
-
+				
 			});
 		}
 		function handleStepByStepButtonClick() {
@@ -240,46 +230,44 @@
 		function handleChooseLivingRoom() {
 			document.getElementById("living-room").addEventListener("click", () => {
 				var from = camera.position;
-
-				var to = { x: 70, y: 60, z: 0 };
+				
+				var to = {x:50,y:60,z:20};
 				var tween = new TWEEN.default.Tween(from)
 					.to(to, 1000)
 					// .easing(TWEEN.default.Easing.Linear.None)
-					.onUpdate(function () {
-
-					})
-					.onComplete(function () {
-
-					})
-				tween.start();
-			});
+					.onUpdate(function () {	
+						camera.lookAt(200,60,-20);
+				})
+					.onComplete(function () {	
+						 controls.target = new THREE.Vector3(200,60,-20);				
+				})
+				tween.start();					
+			});		
 		}
 		function handleChooseGarage() {
 			document.getElementById("garage").addEventListener("click", () => {
 				var from = camera.position;
-				var to = { x: 0, y: 60, z: -300 };
+				var to = {x:-150,y:80,z:10};
 				var tween = new TWEEN.default.Tween(from)
 					.to(to, 1000)
 					.easing(TWEEN.default.Easing.Linear.None)
 					.onUpdate(function () {
 
-
-					})
+						camera.lookAt(-155,70,0);
+				})
 					.onComplete(function () {
-
-					})
-				tween.start();
-			});
+						controls.target = new THREE.Vector3(-155,70,0);
+				})
+				tween.start();				
+			});	
 		}
 
 		function init() {
-			console.log("init");
-
 			container = document.createElement('div');
 			container.setAttribute("id", "container");
 			document.body.appendChild(container);
 
-			camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 2000);
+			camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 1, 2000);
 
 			camera.position.set(0, 500, 800);
 
@@ -301,7 +289,7 @@
 
 			//controls
 			controls = new THREE.OrbitControls(camera, renderer.domElement);
-			controls.enableZoom = false;
+			// controls.enableZoom = false;
 			//event
 			window.addEventListener('resize', onWindowResize, false);
 
@@ -317,6 +305,7 @@
 			loader.load('floor_plan/scene.gltf', function (gltf) {
 				gltf.scene.position.x = -550;
 				scene.add(gltf.scene);
+				
 			}, onProgress, function (error) {
 				console.error(error);
 			});
@@ -359,11 +348,12 @@
 					}
 					break;
 
-				default:
-					{
-						controls.update(clock.getDelta());
-						break;
-					}
+			// 	default:
+			// 		{
+			// 			controls.update(clock.getDelta());
+			// 			break;
+			// 		}
+			// }
 			}
 		}
 		function keyDown(event) {
