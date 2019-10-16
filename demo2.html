@@ -131,10 +131,10 @@
 					.to(to, 2000)
 					.easing(TWEEN.default.Easing.Linear.None)
 					.onUpdate(function () {
-						camera.lookAt(0,0,0);
+						camera.lookAt(100,0,0);
 					})
 					.onComplete(function () {
-						
+						controls.target = new THREE.Vector3(100,0,20);
 					})
 				tween.start();
 				
@@ -217,14 +217,59 @@
 				else eventState = 3;
 			});
 		}
-		function handleSlideShowButtonClick() {
-			document.getElementById("slide-show").addEventListener("click", () => {
-				if (eventState === 4) {
-					eventState = -1;
-					return;
-				}
-				else eventState = 4;
+		function handleSlideShowButtonClick(){
+			document.getElementById("slide-show").addEventListener("click",()=>{
+				SlideShowButton();
 			});
+		}
+		
+		async function SlideShowButton() { 
+			
+				var fromA = camera.position;
+				var toA = { x: 0, y: 500, z: 0 };
+				var tweenA = new TWEEN.default.Tween(fromA)
+					.to(toA, 2000)
+					.easing(TWEEN.default.Easing.Linear.None)
+					.onUpdate(function () {
+						camera.lookAt(100,0,0);
+					})
+					.onComplete(function () {
+						controls.target = new THREE.Vector3(100,0,20);
+					})
+				
+			
+			
+				var fromB = camera.position;
+				var toB = {x:50,y:60,z:20};
+				var tweenB = new TWEEN.default.Tween(fromB)
+					.to(toB, 1000)
+					// .easing(TWEEN.default.Easing.Linear.None)
+					.onUpdate(function () {	
+						camera.lookAt(200,60,-20);
+				})
+					.onComplete(function () {	
+						 controls.target = new THREE.Vector3(200,60,-20);				
+				}).delay(1000)
+				
+			
+		
+				var fromC = camera.position;
+				var toC = {x:-150,y:80,z:10};
+				var tweenC = new TWEEN.default.Tween(fromC)
+					.to(toC, 1000)
+					.easing(TWEEN.default.Easing.Linear.None)
+					.onUpdate(function () {
+
+						camera.lookAt(-155,70,0);
+				})
+					.onComplete(function () {
+						controls.target = new THREE.Vector3(-155,70,0);
+				}).delay(1000)
+				tweenA.start();
+				tweenA.chain(tweenB);
+				tweenB.chain(tweenC);
+			
+			
 		}
 
 		function handleChooseLivingRoom() {
