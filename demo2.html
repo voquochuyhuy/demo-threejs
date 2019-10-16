@@ -164,9 +164,9 @@
 					else {
 						eventState = 2;
 					};
-					controls = new THREE.FirstPersonControls(camera, renderer.domElement);
-					controls.movementSpeed = 500;
-					controls.lookSpeed = 0.01;
+					// controls = new THREE.FirstPersonControls(camera, renderer.domElement);
+					// controls.movementSpeed = 500;
+					// controls.lookSpeed = 0.01;
 					// controls.enableRotate = false;
 					// document.addEventListener("wheel", (e) => {
 					// 	if (e.deltaY < 0) {
@@ -368,7 +368,7 @@
 		window.addEventListener('keyup', keyUp);
 
 		function render() {
-			controls.update(clock.getDelta());
+			// controls.update(clock.getDelta());
 			renderer.render(scene, camera);
 		}
 		function animate() {
