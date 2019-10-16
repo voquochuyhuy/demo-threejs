@@ -321,31 +321,13 @@
 		}
 		//update
 		function update() {
-			switch (eventState) {
-				case 1:
-					if (camera.position.z > 0) {
-						camera.position.z -= 5;
-						camera.position.y -= 1.5;
-					}
-					if (camera.position.x < 270)
-						camera.position.x += 3;
-					if (camera.position.z <= 0 && camera.position.x >= 270) {
-						controls.update();
-						eventState = -1;
-					}
-					break;
+			switch (eventState) {		
 				case 2:
-					// camera.position.z -= 3;
 					{
 						controls.update(clock.getDelta());
 					}
 					break;
-				// case 3 :
-				// camera.position.z -= 3;
-				// break;
-				case 4:
-					camera.position.z -= 3;
-					break;
+
 				default:
 					{
 						controls.update(clock.getDelta());
