@@ -104,6 +104,7 @@
 
 	<script type="module">
 		import * as TWEEN from "./Tween.js";
+		import Stats from "./js/jsm/stats.module.js";
 		var container, controls;
 		var camera, scene, renderer;
 		var eventState = -1;
@@ -111,6 +112,7 @@
 		var clock = new THREE.Clock();
 		var viewerHeight = 1.8;
 		var keyboard = {};
+		var stats;
 		handleTopViewButtonClick();
 		handleStepByStepButtonClick();
 		handleChooseRoomButtonClick();
@@ -155,7 +157,7 @@
 		};
 		function firstPersonView() {
 			var from = camera.position;
-			var to = { x: 50, y: 50, z: 200 };
+			var to = { x: -100, y: 50, z: -200 };
 			var tween = new TWEEN.default.Tween(from)
 				.to(to, 2000)
 				.easing(TWEEN.default.Easing.Linear.None)
@@ -163,7 +165,7 @@
 				})
 				.onComplete(function () {
 					camera.position.set(to.x, to.y, to.z);
-					camera.lookAt(new THREE.Vector3(0, 1.2, 0));
+					camera.lookAt(new THREE.Vector3(0, 50, 0));
 					controls.target.copy(scene.position);
 					console.log("okkkk");
 					if (eventState === 2) {
@@ -172,7 +174,10 @@
 					else {
 						eventState = 2;
 					};
-					controls.enableRotate = false;
+					controls = new THREE.FirstPersonControls(camera, renderer.domElement);
+					controls.movementSpeed = 500;
+					controls.lookSpeed = 0.01;
+					// controls.enableRotate = false;
 					// document.addEventListener("wheel", (e) => {
 					// 	if (e.deltaY < 0) {
 					// 		camera.position.x += 10;
@@ -231,40 +236,40 @@
 				else eventState = 4;
 			});
 		}
-		
-		function handleChooseLivingRoom(){
-			document.getElementById("living-room").addEventListener("click",()=>{	
+
+		function handleChooseLivingRoom() {
+			document.getElementById("living-room").addEventListener("click", () => {
 				var from = camera.position;
-				
-				var to = {x:70,y:60,z:0};
+
+				var to = { x: 70, y: 60, z: 0 };
 				var tween = new TWEEN.default.Tween(from)
 					.to(to, 1000)
 					// .easing(TWEEN.default.Easing.Linear.None)
-					.onUpdate(function () {	
-						
-				})
+					.onUpdate(function () {
+
+					})
 					.onComplete(function () {
-						
-				})
-				tween.start();					
-			});		
+
+					})
+				tween.start();
+			});
 		}
-		function handleChooseGarage(){
-			document.getElementById("garage").addEventListener("click",()=>{	
+		function handleChooseGarage() {
+			document.getElementById("garage").addEventListener("click", () => {
 				var from = camera.position;
-				var to = {x:0,y:60,z:-300};
+				var to = { x: 0, y: 60, z: -300 };
 				var tween = new TWEEN.default.Tween(from)
 					.to(to, 1000)
 					.easing(TWEEN.default.Easing.Linear.None)
-					.onUpdate(function () {	
+					.onUpdate(function () {
 
-						
-				})
+
+					})
 					.onComplete(function () {
-						
-				})
-				tween.start();				
-			});	
+
+					})
+				tween.start();
+			});
 		}
 
 		function init() {
@@ -286,6 +291,8 @@
 			renderer.gammaFactor = 2.2;
 			container.appendChild(renderer.domElement);
 
+			stats = new Stats();
+			container.appendChild(stats.dom);
 			//scene
 			scene = new THREE.Scene();
 
@@ -322,25 +329,25 @@
 		}
 		//update
 		function update() {
-			switch (eventState) {		
+			switch (eventState) {
 				case 2:
 					{
 						controls.update(clock.getDelta());
 						if (keyboard[87]) { // W key
-							camera.position.x -= Math.sin(camera.rotation.y) * 0.2;
-							camera.position.z -= -Math.cos(camera.rotation.y) * 0.2;
+							camera.position.x -= Math.sin(camera.rotation.y) * 2;
+							camera.position.z -= -Math.cos(camera.rotation.y) * 2;
 						}
 						if (keyboard[83]) { // S key
-							camera.position.x += Math.sin(camera.rotation.y) * 0.2;
-							camera.position.z += -Math.cos(camera.rotation.y) * 0.2;
+							camera.position.x += Math.sin(camera.rotation.y) * 2;
+							camera.position.z += -Math.cos(camera.rotation.y) * 2;
 						}
 						if (keyboard[65]) { // A key
-							camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * 0.2;
-							camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * 0.2;
+							camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * 2;
+							camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * 2;
 						}
 						if (keyboard[68]) { // D key
-							camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * 0.2;
-							camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * 0.2;
+							camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * 2;
+							camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * 2;
 						}
 
 						if (keyboard[37]) { // left arrow key
@@ -369,11 +376,16 @@
 
 		window.addEventListener('keydown', keyDown);
 		window.addEventListener('keyup', keyUp);
+
+		function render() {
+			controls.update(clock.getDelta());
+			renderer.render(scene, camera);
+		}
 		function animate() {
 			requestAnimationFrame(animate);
 			TWEEN.default.update();
-			update();
-			renderer.render(scene, camera);
+			render();
+			stats.update();
 		}
 	</script>
 
