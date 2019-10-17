@@ -131,13 +131,13 @@
 					.to(to, 2000)
 					.easing(TWEEN.default.Easing.Linear.None)
 					.onUpdate(function () {
-						camera.lookAt(0,0,0);
+						camera.lookAt(0, 0, 0);
 					})
 					.onComplete(function () {
-						
+
 					})
 				tween.start();
-				
+
 			});
 		}
 		function handleStepByStepButtonClick() {
@@ -164,10 +164,18 @@
 					else {
 						eventState = 2;
 					};
-					controls = new THREE.FirstPersonControls(camera, renderer.domElement);
-					controls.movementSpeed = 500;
-					controls.lookSpeed = 0.01;
-					// controls.enableRotate = false;
+
+
+					transparentSphere = new THREE.MeshBasicMaterial({ color: 0x9999ff });
+					boxGeo = new THREE.BoxGeometry(20, 20, 20);
+					movingBox = new THREE.Mesh(boxGeo, transparentSphere);
+					movingBox.position.set(to.x, to.y, to.z);
+					scene.add(movingBox);
+					// controls = new THREE.FirstPersonControls(camera, renderer.domElement);
+					// controls.movementSpeed = 500;
+					// controls.lookSpeed = 0.01;
+					controls.enableRotate = false;
+					controls.enablePan = false;
 					// document.addEventListener("wheel", (e) => {
 					// 	if (e.deltaY < 0) {
 					// 		camera.position.x += 10;
@@ -202,6 +210,8 @@
 			tween.start();
 
 		}
+		var transparentSphere, boxGeo, movingBox;
+
 		function handleChooseRoomButtonClick() {
 
 			document.getElementById("choose-room").addEventListener("click", () => {
@@ -230,36 +240,36 @@
 		function handleChooseLivingRoom() {
 			document.getElementById("living-room").addEventListener("click", () => {
 				var from = camera.position;
-				
-				var to = {x:50,y:60,z:20};
+
+				var to = { x: 50, y: 60, z: 20 };
 				var tween = new TWEEN.default.Tween(from)
 					.to(to, 1000)
 					// .easing(TWEEN.default.Easing.Linear.None)
-					.onUpdate(function () {	
-						camera.lookAt(200,60,-20);
-				})
-					.onComplete(function () {	
-						 controls.target = new THREE.Vector3(200,60,-20);				
-				})
-				tween.start();					
-			});		
+					.onUpdate(function () {
+						camera.lookAt(200, 60, -20);
+					})
+					.onComplete(function () {
+						controls.target = new THREE.Vector3(200, 60, -20);
+					})
+				tween.start();
+			});
 		}
 		function handleChooseGarage() {
 			document.getElementById("garage").addEventListener("click", () => {
 				var from = camera.position;
-				var to = {x:-150,y:80,z:10};
+				var to = { x: -150, y: 80, z: 10 };
 				var tween = new TWEEN.default.Tween(from)
 					.to(to, 1000)
 					.easing(TWEEN.default.Easing.Linear.None)
 					.onUpdate(function () {
 
-						camera.lookAt(-155,70,0);
-				})
+						camera.lookAt(-155, 70, 0);
+					})
 					.onComplete(function () {
-						controls.target = new THREE.Vector3(-155,70,0);
-				})
-				tween.start();				
-			});	
+						controls.target = new THREE.Vector3(-155, 70, 0);
+					})
+				tween.start();
+			});
 		}
 
 		function init() {
@@ -305,7 +315,7 @@
 			loader.load('floor_plan/scene.gltf', function (gltf) {
 				gltf.scene.position.x = -550;
 				scene.add(gltf.scene);
-				
+
 			}, onProgress, function (error) {
 				console.error(error);
 			});
@@ -321,39 +331,54 @@
 			switch (eventState) {
 				case 2:
 					{
-						controls.update(clock.getDelta());
+						var delta = clock.getDelta();
+						controls.update(delta);
 						if (keyboard[87]) { // W key
-							camera.position.x -= Math.sin(camera.rotation.y) * 2;
-							camera.position.z -= -Math.cos(camera.rotation.y) * 2;
+							// camera.position.x -= Math.sin(camera.rotation.y) * 2;
+							// camera.position.z -= -Math.cos(camera.rotation.y) * 2;
+							movingBox.translateZ(-400 * delta);
 						}
 						if (keyboard[83]) { // S key
-							camera.position.x += Math.sin(camera.rotation.y) * 2;
-							camera.position.z += -Math.cos(camera.rotation.y) * 2;
+							movingBox.translateZ(400 * delta);
+							// camera.position.x += Math.sin(camera.rotation.y) * 2;
+							// camera.position.z += -Math.cos(camera.rotation.y) * 2;
 						}
 						if (keyboard[65]) { // A key
-							camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * 2;
-							camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * 2;
+							// camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * 2;
+							// camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * 2;
+							// movingBox.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2 * delta);
+							movingBox.translateX(-400 * delta);
 						}
 						if (keyboard[68]) { // D key
-							camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * 2;
-							camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * 2;
+							// camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * 2;
+							// camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * 2;
+							// movingBox.rotateOnAxis(new THREE.Vector3(0, 1, 0), -Math.PI / 2 * delta);
+							movingBox.translateX(400 * delta);
 						}
 
-						if (keyboard[37]) { // left arrow key
-							camera.rotation.y -= Math.PI * 0.02;
-						}
-						if (keyboard[39]) { // right arrow key
-							camera.rotation.y += Math.PI * 0.02;
-						}
+						// if (keyboard[37]) { // left arrow key
+						// 	camera.rotation.y -= Math.PI * 0.02;
+						// }
+						// if (keyboard[39]) { // right arrow key
+						// 	camera.rotation.y += Math.PI * 0.02;
+						// }
+						var relativeCameraOffset = new THREE.Vector3(0, 50, 200);
+
+						var cameraOffset = relativeCameraOffset.applyMatrix4(movingBox.matrixWorld);
+
+						camera.position.x = cameraOffset.x;
+						camera.position.y = cameraOffset.y;
+						camera.position.z = cameraOffset.z;
+						camera.lookAt(movingBox.position);
 					}
 					break;
 
-			// 	default:
-			// 		{
-			// 			controls.update(clock.getDelta());
-			// 			break;
-			// 		}
-			// }
+				// 	default:
+				// 		{
+				// 			controls.update(clock.getDelta());
+				// 			break;
+				// 		}
+				// }
 			}
 		}
 		function keyDown(event) {
@@ -375,6 +400,7 @@
 			requestAnimationFrame(animate);
 			TWEEN.default.update();
 			render();
+			update();
 			stats.update();
 		}
 	</script>
